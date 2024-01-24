@@ -1,0 +1,15 @@
+module purge
+module unuse /project/ukmo/rhel7/R/modulefiles; module unuse /project/ukmo/rhel7/fortran/opt/gfortran/modulefiles
+module use /project/extrasoftware/modulefiles.rhel7
+module use /data/users/lfric/software/modulefiles.rhel7
+
+module load environment/lfric/gcc
+
+export NETCDF_LIB_DIR=$NETCDF_4_8_1_ROOT/lib:$NETCDF_4_8_1_ROOT/lib64
+export NETCDF_INC_DIR=$NETCDF_4_8_1_ROOT/include
+
+. arch/arch-GCC_LINUX_APT.path
+
+export XIOS_INCDIR=$XIOS_R2252_2_ROOT/include
+export XIOS_LIBDIR=$XIOS_R2252_2_ROOT/lib
+export XIOS_BINDIR=$XIOS_R2252_2_ROOT/bin
