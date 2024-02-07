@@ -1,2 +1,2 @@
-# tcd-XIOS-admin
-Admin tools for XIOS management
+# tcd-XIOS-demonstration
+Demonstration code for XML I/O server XIOS usage.
