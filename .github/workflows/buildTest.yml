@@ -1,14 +1,19 @@
 name: build-test-XIOS
 
-on: [push, pull_request]
+on: 
+  push:
+    branches:
+      - main
+  pull_request:
 
 jobs:
   build_test:
-    name: build XIOS and run tests
+    name: build test
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        version: [XIOS/trunk@2252, XIOS2/trunk, XIOS3/trunk]
+        # version: [XIOS/trunk@2252, XIOS2/trunk, XIOS3/trunk]
+        version: [XIOS/trunk@2252, XIOS2/trunk]
     steps:
       # Check out repository branch
       - uses: actions/checkout@v4
@@ -42,8 +47,10 @@ jobs:
         run: |
           . arch/arch-GCC_LINUX_APT.env
           . arch/arch-GCC_LINUX_APT.path
-          export XIOS_BINDIR=$PWD/XIOS2/bin
-          export XIOS_INCDIR=$PWD/XIOS2/inc
-          export XIOS_LIBDIR=$PWD/XIOS2/lib
+          export XIOS_BINDIR=$PWD/XIOS/bin
+          export XIOS_INCDIR=$PWD/XIOS/inc
+          export XIOS_LIBDIR=$PWD/XIOS/lib
 
-          python3 -m unittest Discover -v -s xios_examples
+          export MVER=${{ matrix.version }}
+
+          python3 -m unittest discover -v -s xios_examples

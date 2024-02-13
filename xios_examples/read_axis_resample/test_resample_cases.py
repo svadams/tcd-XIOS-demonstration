@@ -4,6 +4,7 @@ import netCDF4
 import numpy as np
 import os
 import subprocess
+import glob
 import unittest
 
 this_path = os.path.realpath(__file__)
@@ -12,7 +13,7 @@ this_dir = os.path.dirname(this_path)
 class TestResample(unittest.TestCase):
     """
     UnitTest class to contain tests,
-    1 test casce function per input `.cdl` file
+    1 test case function per input `.cdl` file
 
     """
     @classmethod
@@ -21,14 +22,34 @@ class TestResample(unittest.TestCase):
         First, build the fortran code only once for this class.
 
         """
-        subprocess.run(['make', 'clean'], cwd=this_dir)
-        subprocess.run(['make'], cwd=this_dir)
+        subprocess.run(['make', 'clean'], cwd=this_dir, check=True)
+        subprocess.run(['make'], cwd=this_dir, check=True)
+        if os.environ.get('MVER', '') == 'XIOS3/trunk':
+            with open(os.path.join(this_dir, 'iodef.xml'), 'r') as ioin:
+                iodef_in = ioin.read()
+            # patch in transport protocol choice for XIOS3
+            # needed for CI runners
+            in2 = '<variable_group id="parameters" >'
+            in3 = ('<variable_group id="parameters" >\n'
+                   '    <variable id="transport_protocol" '
+                   'type="string" >p2p</variable>')
+            iodef_out = iodef_in.replace(in2, in3)
+            with open(os.path.join(this_dir, 'iodef.xml'), 'w') as ioout:
+                ioout.write(iodef_out)
 
     def tearDown(self):
         """
-        After each test function, remove the input and output netCDF files.
+        After each test function,
+        report any errors from XIOS, then
+        remove the input and output netCDF files.
 
         """
+
+        for ef in glob.glob('{}/*.err'.format(this_dir)):
+            print(ef)
+            with open(ef, 'r') as efile:
+                print(efile.read(), flush=True)
+
         os.remove('{}/axis_input.nc'.format(this_dir))
         os.remove('{}/axis_output.nc'.format(this_dir))
 
@@ -59,10 +80,11 @@ for f in glob.glob('{}/*.cdl'.format(this_dir)):
         def test_resample(self):
             # create a netCDF file from the `.cdl` input
             subprocess.run(['ncgen', '-k', 'nc4', '-o', 'axis_input.nc',
-                            infile], cwd=this_dir)
+                            infile], cwd=this_dir, check=True)
             # run the compiled Fortran XIOS programme
             subprocess.run(['mpiexec', '-n', '1', './resample.exe', ':',
-                            '-n', '1', './xios_server.exe'], cwd=this_dir)
+                            '-n', '1', './xios_server.exe'],
+                            cwd=this_dir, check=True)
             # load the result netCDF file
             rootgrp = netCDF4.Dataset('{}/axis_output.nc'.format(this_dir),
                                       'r')
