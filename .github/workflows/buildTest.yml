@@ -6,6 +6,9 @@ jobs:
   build_test:
     name: build XIOS and run tests
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        version: [XIOS/trunk@2252, XIOS2/trunk, XIOS3/trunk]
     steps:
       # Check out repository branch
       - uses: actions/checkout@v4
@@ -16,17 +19,20 @@ jobs:
             sudo apt -yq install $(<dependencies)
       - name: clone and build XIOS
         run: |
-          svn co http://forge.ipsl.jussieu.fr/ioserver/svn/XIOS2/trunk XIOS2
-          cp arch/* XIOS2/arch/
-          cd XIOS2
+          svn co http://forge.ipsl.jussieu.fr/ioserver/svn/${{ matrix.version }} XIOS
+          cp arch/* XIOS/arch/
+          cd XIOS
+          if [ ${{ matrix.version }} == 'XIOS3/trunk' ]; then
+            patch -p0 < ../patches/xios3/revert_svn2517_transport.patch
+            sed -i 's/<variable_group id="parameters" >/<variable_group id="parameters" > <variable id="transport_protocol" type="string" >p2p<\/variable>/g' generic_testcase/iodef.xml
+            cat generic_testcase/iodef.xml
+          fi
           ./make_xios --job 2 --arch GCC_LINUX_APT
-          ls -l lib/
-          ls -l inc/
-          ls -l bin/
           cd ..
+        shell: bash
       - name: run generic
         run: |
-          cd XIOS2/generic_testcase
+          cd XIOS/generic_testcase
           ln -s ../bin/generic_testcase.exe
           ln -s ../bin/xios_server.exe
           sed -i 's/nb_proc_atm=4/nb_proc_atm=1/g' param.def
