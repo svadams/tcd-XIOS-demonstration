@@ -37,6 +37,8 @@ LDFLAGS = \
 	-lnetcdff \
 	-lstdc++ 
 
+.PHONY: all, clean, run
+
 all: resample
 
 # fortran compilation

@@ -56,7 +56,7 @@ class TestResample(unittest.TestCase):
     @classmethod
     def tearDownClass(cls):
         """
-        Finally, clean the build the fortran code only once for this class.
+        Finally, clean the build for this class, after all tests have run.
 
         """
         subprocess.run(['make', 'clean'], cwd=this_dir)
