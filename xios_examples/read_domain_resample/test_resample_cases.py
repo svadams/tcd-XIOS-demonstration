@@ -4,7 +4,6 @@ import netCDF4
 import numpy as np
 import os
 import subprocess
-import glob
 import unittest
 
 import xios_examples.shared_testing as xshared
@@ -12,11 +11,11 @@ import xios_examples.shared_testing as xshared
 this_path = os.path.realpath(__file__)
 this_dir = os.path.dirname(this_path)
 
-class TestResampleAxis(xshared._TestCase):
+class TestResampleDomain(xshared._TestCase):
     test_dir = this_dir
-    transient_inputs = ['axis_input.nc']
-    transient_outputs = ['axis_output.nc']
-    rtol = 5e-04
+    transient_inputs = ['domain_input.nc']
+    transient_outputs = ['domain_output.nc']
+    rtol = 5e-03
 
 
 # A list of input `.cdl` files where XIOS is known to produce different
@@ -26,11 +25,13 @@ class TestResampleAxis(xshared._TestCase):
 # to register as a known_failure (tname)
 # and the value is a string explaining the failure
 # this handles FAIL conditions but NOT ERROR conditions
-known_failures = {'test_axis_input_edge_simple_square_ten':
-                  ('The last value, nearest the upper edge is'
-                   ' not being interpolated using a square poynomial'
-                   ' unlike the first, which is also near the edge'
-                   ' and is being calculated sensibly')}
+known_failures = {'test_domain_input_edge_simple_square_ten':
+                  ('The bi-linear polynomial poorly reproduces the'
+                   ' input x^2+y^2 function'),
+                  'test_domain_input_simple_square_ten':
+                  ('The bi-linear polynomial poorly reproduces the'
+                   ' input x^2+y^2 function')
+                  }
 
 # iterate through `.cdl` files in this test case folder
 for f in glob.glob('{}/*.cdl'.format(this_dir)):
@@ -40,12 +41,12 @@ for f in glob.glob('{}/*.cdl'.format(this_dir)):
     if os.environ.get('MVER', '') == 'XIOS3/trunk':
         # these tests are hitting exceptions with XIOS3
         # but not XIOS2, so skip for XIOS3 runner
-        setattr(TestResampleAxis, tname,
-                unittest.skip(TestResampleAxis.make_a_resample_test(f)))
+        setattr(TestResampleDomain, tname,
+                unittest.skip(TestResampleDomain.make_a_resample_test(f)))
     elif tname in known_failures:
         # set decorator @unittest.expectedFailure
-        setattr(TestResampleAxis, tname,
-                unittest.expectedFailure(TestResampleAxis.make_a_resample_test(f)))
+        setattr(TestResampleDomain, tname,
+                unittest.expectedFailure(TestResampleDomain.make_a_resample_test(f)))
     else:
-        setattr(TestResampleAxis, tname,
-                TestResampleAxis.make_a_resample_test(f))
+        setattr(TestResampleDomain, tname,
+                TestResampleDomain.make_a_resample_test(f))
