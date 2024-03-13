@@ -7,6 +7,8 @@
       <axis id="pressure_levels1" positive="down" long_name="Air Pressure" standard_name="air_pressure" unit="Pa">
         <interpolate_axis type="polynomial" order="1" coordinate="pressure" />
       </axis>
+      <axis id="pressure_levels_nointerp" positive="down" long_name="Air Pressure" standard_name="air_pressure" unit="Pa">
+      </axis>
 
     </axis_definition>
 
@@ -24,14 +26,18 @@
         <domain domain_ref="latlon_domain" />
         <axis axis_ref="pressure_levels1" />
       </grid>
+      <grid id="model_plev_nointerp">
+        <domain domain_ref="latlon_domain" />
+        <axis axis_ref="pressure_levels_nointerp" />
+      </grid>
     </grid_definition>
 
     <field_definition freq_op="1ts" enabled=".TRUE." operation="instant" >
       <field id="pressure" name="pressure" long_name="Air Pressure" standard_name="air_pressure" unit="Pa" grid_ref="model" />
       <field id="temperature" name="temperature" long_name="Air Temperature" standard_name="air_temperature" unit="K" grid_ref="model" />
       <field id="temperature_on_P" name="resampled_data" long_name="Air Temperature" standard_name="air_temperature" unit="K" field_ref="temperature" grid_ref="model_plev" />
-      <field id="expected" name="resample_data" long_name="Expected Air Temperature" standard_name="air_temperature" unit="K" grid_ref="model_plev" />
-      <field id="diff" name="resampled_minus_resample" long_name="Air Temperature difference" unit="K" grid_ref="model_plev">temperature_on_P - expected</field>
+      <field id="expected" name="resample_data" long_name="Expected Air Temperature" standard_name="air_temperature" unit="K" grid_ref="model_plev_nointerp" />
+      <field id="diff" name="resampled_minus_resample" long_name="Air Temperature difference" unit="K" grid_ref="model_plev_nointerp">temperature_on_P - expected</field>
 
     </field_definition>
 

@@ -93,6 +93,7 @@ contains
     !call xios_set_axis_attr('model_levels', n_glo=lenz)
     call xios_set_axis_attr('model_levels', n_glo=lenz, n=lenz, value=mlvals)
     call xios_set_axis_attr('pressure_levels1', n_glo=lenrz, n=lenrz, value=plvals)
+    call xios_set_axis_attr('pressure_levels_nointerp', n_glo=lenrz, n=lenrz, value=plvals)
 
     call xios_set_domain_attr('latlon_domain', ni_glo=lenx, nj_glo=leny, ni=lenx, nj=leny, ibegin=0, jbegin=0)
     call xios_set_domain_attr('latlon_domain', lonvalue_1d=lonvals, latvalue_1d=latvals, bounds_lon_1d=lonb, bounds_lat_1d=latb)
