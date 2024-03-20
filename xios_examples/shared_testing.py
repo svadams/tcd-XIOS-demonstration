@@ -30,7 +30,7 @@ class _TestCase(unittest.TestCase):
         subprocess.run(['make', 'clean'], cwd=cls.test_dir)
         subprocess.run(['make'], cwd=cls.test_dir)
         if os.environ.get('MVER', '') == 'XIOS3/trunk':
-            with open(os.path.join(cls.test_dir, 'main.xml'), 'r') as ioin:
+            with open(os.path.join(cls.test_dir, 'xios.xml'), 'r') as ioin:
                 iodef_in = ioin.read()
             # patch in transport protocol choice for XIOS3
             # needed for CI runners
@@ -39,7 +39,7 @@ class _TestCase(unittest.TestCase):
                    '    <variable id="transport_protocol" '
                    'type="string" >p2p</variable>')
             iodef_out = iodef_in.replace(in2, in3)
-            with open(os.path.join(this_dir, 'iodef.xml'), 'w') as ioout:
+            with open(os.path.join(cls.test_dir, 'xios.xml'), 'w') as ioout:
                 ioout.write(iodef_out)
 
     def tearDown(self):
@@ -53,7 +53,7 @@ class _TestCase(unittest.TestCase):
         for single test functions only.
         """
 
-        for ef in glob.glob('{}/*.err'.format(this_dir)):
+        for ef in glob.glob('{}/*.err'.format(self.test_dir)):
             print(ef)
             with open(ef, 'r') as efile:
                 print(efile.read(), flush=True)
@@ -111,11 +111,12 @@ class _TestCase(unittest.TestCase):
                    'differs from the resampled data array\n {res} \n '
                    'with diff \n {diff}\n')
             msg = msg.format(exp=expected, res=result, diff=diff)
-            if np.any(diff):
+            if not np.allclose(result, expected, rtol=cls.rtol):
                 # print message for fail case,
                 # as expected failures do not report msg.
                 print(msg)
             # assert that all of the `diff` varaible values are zero
             # self.assertTrue(not np.any(diff), msg=msg)
-            self.assertTrue(np.allclose(result, expected, rtol=cls.rtol), msg=msg)
+            self.assertTrue(np.allclose(result, expected, rtol=cls.rtol),
+                            msg=msg)
         return test_resample
