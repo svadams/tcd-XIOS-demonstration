@@ -213,11 +213,11 @@ Index: src/manager/ressources_manager.cpp
    
 @@ -135,7 +139,7 @@
      winNotify_->popFromLockedWindow(commRank, this, &CRessourcesManager::notificationsDumpIn) ;
-     CTimer::get("CRessourcesManager::checkNotifications pop").suspend();
-     CTimer::get("CRessourcesManager::checkNotifications unlock").resume();
+     if (info.isActive(logTimers)) CTimer::get("CRessourcesManager::checkNotifications pop").suspend();
+     if (info.isActive(logTimers)) CTimer::get("CRessourcesManager::checkNotifications unlock").resume();
 -    winNotify_->unlockWindowExclusive(commRank) ;
 +    winNotify_->unlockWindow(commRank) ;
-     CTimer::get("CRessourcesManager::checkNotifications unlock").suspend();
+     if (info.isActive(logTimers)) CTimer::get("CRessourcesManager::checkNotifications unlock").suspend();
      if (notifyType_==NOTIFY_CREATE_POOL) createPool() ;
      else if (notifyType_==NOTIFY_FINALIZE) finalizeSignal() ;
 @@ -192,46 +196,48 @@
