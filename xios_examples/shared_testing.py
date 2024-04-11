@@ -22,14 +22,28 @@ class _TestCase(unittest.TestCase):
     rtol = 5e-03
 
     @classmethod
+    def run_mpi_xios(cls):
+        # run the compiled Fortran XIOS programme
+        if os.environ.get('PLATFORM', '') == 'Archer2':
+            subprocess.run(['srun', '--distribution=block:block', '--hint=nomultithread',
+                            '--het-group=0', '--nodes=1', '-n', '1',
+                            './resample.exe', ':',
+                            '--het-group=1', '--nodes=1', '-n', '1',
+                            './xios_server.exe'],cwd=cls.test_dir, check=True)
+        else:
+            subprocess.run(['mpiexec', '-n', '1', './resample.exe', ':',
+                           '-n', '1', './xios_server.exe'],
+                           cwd=cls.test_dir, check=True)
+
+    @classmethod
     def setUpClass(cls):
         """
         First, build the fortran code only once for this class.
 
         """
-        subprocess.run(['make', 'clean'], cwd=cls.test_dir)
-        subprocess.run(['make'], cwd=cls.test_dir)
-        if os.environ.get('MVER', '') == 'XIOS3/trunk':
+        subprocess.run(['make', 'clean'], cwd=cls.test_dir, check=True)
+        subprocess.run(['make'], cwd=cls.test_dir, check=True)
+        if os.environ.get('MVER', '').startswith('XIOS3/trunk'):
             with open(os.path.join(cls.test_dir, 'xios.xml'), 'r') as ioin:
                 iodef_in = ioin.read()
             # patch in transport protocol choice for XIOS3
@@ -76,6 +90,18 @@ class _TestCase(unittest.TestCase):
         """
         if not os.environ.get('logs'):
             subprocess.run(['make', 'clean'], cwd=cls.test_dir)
+        if os.environ.get('MVER', '').startswith('XIOS3/trunk'):
+            with open(os.path.join(cls.test_dir, 'xios.xml'), 'r') as ioin:
+                iodef_in = ioin.read()
+            # patch back out transport protocol choice for XIOS3
+            # to avoid spurious git diff
+            in2 = '<variable_group id="parameters" >'
+            in3 = ('<variable_group id="parameters" >\n'
+                   '    <variable id="transport_protocol" '
+                   'type="string" >p2p</variable>')
+            iodef_out = iodef_in.replace(in3, in2)
+            with open(os.path.join(cls.test_dir, 'xios.xml'), 'w') as ioout:
+                ioout.write(iodef_out)
 
 
     @classmethod
@@ -94,10 +120,8 @@ class _TestCase(unittest.TestCase):
             # create a netCDF file from the `.cdl` input
             subprocess.run(['ncgen', '-k', 'nc4', '-o', inputfile,
                             infile], cwd=cls.test_dir, check=True)
-            # run the compiled Fortran XIOS programme
-            subprocess.run(['mpiexec', '-n', '1', './resample.exe', ':',
-                            '-n', '1', './xios_server.exe'],
-                            cwd=cls.test_dir, check=True)
+            cls.run_mpi_xios()
+
             # load the result netCDF file
             runfile = '{}/{}'.format(cls.test_dir, outputfile)
             assert(os.path.exists(runfile))
