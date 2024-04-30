@@ -1,0 +1,8 @@
+<?xml version="1.0"?>
+<simulation>
+
+<context id="stop_5" src="main_stop_5.xml"/>
+<context id="stop_10" src="main_stop_10.xml"/>
+<context id="xios" src="xios.xml"/>
+
+</simulation>
