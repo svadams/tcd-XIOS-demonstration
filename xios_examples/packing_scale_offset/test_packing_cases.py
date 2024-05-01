@@ -44,10 +44,10 @@ class TestPackDomain(xshared._TestCase):
             result = rootgrp['packed_data'][:]
             rtol = rootgrp['packed_data'].scale_factor
             # prepare message for failure
-            msg = ('the expected pack data array\n {exp}\n '
-                   'differs from the packed data array\n {res} \n '
-                   'with diff \n {diff}\n')
-            msg = msg.format(exp=expected, res=result,
+            msg = ('\n the packed data array\n {res}\n '
+                   'differs from the original data array\n {exp} \n '
+                   'with diff outside expected tolerance {rtol}\n {diff}\n')
+            msg = msg.format(exp=expected, res=result, rtol=rtol,
                              diff=result-expected)
             if not np.allclose(result, expected, rtol=rtol):
                 # print message for fail case,
@@ -55,7 +55,8 @@ class TestPackDomain(xshared._TestCase):
                 print(msg)
             # assert that all of the `diff` varaible values are zero
             # self.assertTrue(not np.any(diff), msg=msg)
-            self.assertTrue(np.allclose(result, expected, rtol=rtol),
+            self.assertTrue(np.allclose(result, expected, rtol=rtol) and
+                            not np.allclose(result, expected, rtol=0.1*rtol),
                             msg=msg)
         return test_pack
 

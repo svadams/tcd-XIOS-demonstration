@@ -106,8 +106,8 @@ contains
       call xios_get_current_date(current)
       ! Send (copy) the original data to the output file.
       call xios_send_field('odata', inodata)
-      ! Send the packed data to the output file.
-      ! the `pdata` field is defined as integer with scale_factor
+      ! Send the original data to the output file pack target.
+      ! The `pdata` field is defined as integer with scale_factor
       ! and `add_offset` defined, so XIOS will pack this data
       ! on write.
       call xios_send_field('pdata', inodata)
