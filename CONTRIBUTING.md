@@ -22,7 +22,7 @@ the Contributor Licence Agreement and Certificate of Origin detailed
 below:
 
 <!-- start-shortlog -->
- - Iva Kavcic (Met Office, UK)
+ - Iva Kavčič (Met Office, UK)
  - Mark Hedley (Met Office, UK)
  - Harry Shepherd (Met Office, UK)
 <!-- end-shortlog -->
