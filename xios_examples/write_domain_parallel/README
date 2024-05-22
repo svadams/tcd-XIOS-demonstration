@@ -2,16 +2,16 @@ write_domain_parallel
 ---------------------
 
 This example demonstrates XIOS parallel write of a decomposed domain to one output NetCDF file.
-It sets up a 100 x 100 unstructured horizontal domain with 3 vertical levels and creates two fields with sample data. 
-For file 1, data is written at hourly intervals for 10 timesteps and incremented by 0.2 units. For file 2 data is written at 2-hourly intervals for 5 timesteps and incremented by 0.5 units.
+It sets up a 100 x 100 unstructured horizontal domain with 3 vertical levels and creates a field with sample data. 
+Data is written at hourly intervals for 10 timesteps and incremented by 0.2 units.
 
 Unit tests include:
 
-- Checking the output files exist and are named correctly.
-- Checking that each file has the correct number of times (10,5)
+- Checking the output file exists and is named correctly.
+- Checking that the file has the correct number of times (10)
 - Checking that the average value of the field in level 1 and final 
-  timestep matches what we expect based on the starting value, number 
-  of timesteps and increment (2.8, 3.0)
+  timestep matches what we expect based on the starting value and number 
+  of timesteps and increment (2.8)
 
 
 

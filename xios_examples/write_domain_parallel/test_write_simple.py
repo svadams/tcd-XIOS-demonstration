@@ -35,9 +35,9 @@ class TestParallelWrite(xshared._TestCase):
         rootgrp = netCDF4.Dataset(runfile_1, 'r')
         file_1_data = rootgrp['global_field_1']
 
-        # Check file 1 has 10 times
+        # Check file has 10 times
         assert(file_1_data.shape[0] == 10)
-        # Check average value of file 1, level 1, time 1
+        # Check average value of file for level 1, time 1
         expected = 2.8
         result = np.average(file_1_data[-1,0,:])
         diff = result - expected
