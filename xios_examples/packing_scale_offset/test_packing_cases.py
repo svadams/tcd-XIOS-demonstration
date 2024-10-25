@@ -75,9 +75,9 @@ for f in glob.glob('{}/*.cdl'.format(this_dir)):
     # unique name for the test
     tname = 'test_{}'.format(os.path.splitext(os.path.basename(f))[0])
     # add the test as an attribute (function) to the test class
-    if os.environ.get('MVER', '').startswith('XIOS3/trunk'):
-        # these tests are hitting exceptions with XIOS3
-        # but not XIOS2, so skip for XIOS3 runner
+    if os.environ.get('MVER', '') == 'XIOS/trunk@2252':
+        # this test is hitting exceptions with XIOS2@2252
+        # notImplemented "conversion_by_netcdf" , so skip for XIOS2@2252 runner
         setattr(TestPackDomain, tname,
                 unittest.skip(TestPackDomain.make_a_pack_test(f)))
     elif tname in known_failures:
