@@ -1,0 +1,55 @@
+netcdf daily_average {
+dimensions:
+	axis_nbounds = 2 ;
+	vertical_axis = 10 ;
+	time_counter = UNLIMITED ; // (4 currently)
+variables:
+	double time_centered(time_counter) ;
+		time_centered:standard_name = "time" ;
+		time_centered:long_name = "Time axis" ;
+		time_centered:calendar = "gregorian" ;
+		time_centered:units = "seconds since 2024-01-01 00:00:00" ;
+		time_centered:time_origin = "2024-01-01 00:00:00" ;
+		time_centered:bounds = "time_centered_bounds" ;
+	double time_centered_bounds(time_counter, axis_nbounds) ;
+	double time_counter(time_counter) ;
+		time_counter:axis = "T" ;
+		time_counter:standard_name = "time" ;
+		time_counter:long_name = "Time axis" ;
+		time_counter:calendar = "gregorian" ;
+		time_counter:units = "seconds since 2024-01-01 00:00:00" ;
+		time_counter:time_origin = "2024-01-01 00:00:00" ;
+		time_counter:bounds = "time_counter_bounds" ;
+	double time_counter_bounds(time_counter, axis_nbounds) ;
+	float daily_average(time_counter, vertical_axis) ;
+		daily_average:online_operation = "average" ;
+		daily_average:interval_operation = "1 h" ;
+		daily_average:interval_write = "1 d" ;
+		daily_average:cell_methods = "time: mean (interval: 1 h)" ;
+		daily_average:coordinates = "time_centered" ;
+
+// global attributes:
+		:name = "daily_average" ;
+		:description = "Created by xios" ;
+		:title = "Created by xios" ;
+		:Conventions = "CF-1.6" ;
+		:timeStamp = "2025-Feb-20 14:37:33 GMT" ;
+		:uuid = "ab354f1e-825a-4a18-a530-8573cd4ee6cd" ;
+data:
+
+ time_centered = 43200, 129600, 216000, 302400 ;
+
+ time_centered_bounds =
+  0, 86400,
+  86400, 172800,
+  172800, 259200,
+  259200, 345600 ;
+
+ time_counter = 43200, 129600, 216000, 302400 ;
+
+ time_counter_bounds =
+  0, 86400,
+  86400, 172800,
+  172800, 259200,
+  259200, 345600 ;
+}

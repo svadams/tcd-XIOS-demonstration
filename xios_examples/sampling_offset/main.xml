@@ -1,0 +1,34 @@
+<context>
+    <calendar type="Gregorian"/>
+    <axis_definition>
+        <axis id="vertical_axis" n_glo="10"/>
+    </axis_definition>
+
+    <grid_definition>
+        <grid id="grid_1d">
+            <axis axis_ref="vertical_axis"/>
+        </grid>
+    </grid_definition>
+
+    <field_definition>
+        <field id="a_field" operation="instant" grid_ref="grid_1d"/>
+    </field_definition>
+
+    <file_definition type="one_file" output_freq="1d" enabled=".TRUE.">
+        <file id="output" name="daily_average">
+            <field field_ref="a_field" name="daily_average" operation="average"/>
+
+            <!--By default, the instant operation will output the last value each day. (T=24,48,etc) -->
+            <field field_ref="a_field" name="T=24 (default)"/>
+
+            <!--Setting the offset to zero will output the first value each day instead. (T=1,25,) -->
+            <field field_ref="a_field" name="T=1" freq_offset="0h"/>
+
+            <!--An offset of 11h will output the 12th timestep each day. (T=12,36,) -->
+            <field field_ref="a_field" name="T=12" freq_offset="11h"/>
+
+            <!--An offset of 1d will output the first value of each day, but skip the first day. (T=25,49,) -->
+            <field field_ref="a_field" name="T=25" freq_offset="1d"/>
+        </file>
+    </file_definition>
+</context>

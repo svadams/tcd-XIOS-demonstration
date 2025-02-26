@@ -1,0 +1,27 @@
+<context>
+    <calendar type="Gregorian"/>
+    <axis_definition>
+        <axis id="vertical_axis" n_glo="10"/>
+    </axis_definition>
+
+    <grid_definition>
+        <grid id="grid_1d">
+            <axis axis_ref="vertical_axis"/>
+        </grid>
+    </grid_definition>
+
+    <field_definition>
+        <field id="a_field" operation="average" grid_ref="grid_1d"/>
+    </field_definition>
+
+    <file_definition type="one_file" output_freq="1d" enabled=".TRUE.">
+        <file id="output" name="daily_average">
+            <field field_ref="a_field" name="daily_average"/>
+        </file>
+
+        <file id="shifted_output" name="shifted_daily_average">
+            <!--Shift the average by 12 hours. I.e average values between 12:00 and 12:00 + 1d -->
+            <field field_ref="a_field" name="daily_average" freq_offset="12h"/>
+        </file>
+    </file_definition>
+</context>
