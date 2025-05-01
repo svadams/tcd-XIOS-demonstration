@@ -1,0 +1,22 @@
+cff-version: 1.2.0
+message: "If you use this software, please cite it as below."
+authors:
+- family-names: "Adams"
+  given-names: "Samantha"
+- family-names: "Cole"
+  given-names: "Jeff"
+- family-names: "Hedley"
+  given-names: "Mark"
+- family-names: "Kavčič"
+  given-names: "Iva"
+- family-names: "Mannall"
+  given-names: "Nathan"
+- family-names: "Olivier"
+  given-names: "Ricky"
+- family-names: "Shepherd"
+  given-names: "Harry"
+title: "Demonstration code repository for XIOS (XML I/O server) usage."
+version:
+doi:
+date-released:
+url: "https://github.com/MetOffice/tcd-XIOS-demonstration"
