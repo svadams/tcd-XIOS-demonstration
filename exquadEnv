@@ -1,0 +1,19 @@
+# this environment management script needs to be sourced in order to provide
+# equivalent functionality on the MO EX Quads to the Github CI environment.
+# `. exquadEnv`
+
+# Load modules to set up the envionment
+
+module use /common/internal/spack/ngms
+module load PrgEnv-gnu
+module load gcc/12.2.0
+module load lfric-gnu/12.2.0/1.0
+
+# scitools is needed for netCDF4 to run the python unit tests
+module load scitools 
+
+export FCFLAGS="-g $FFLAGS"
+export LDFLAGS="$LDFLAGS -lxios -lnetcdf -lnetcdff -lstdc++"
+export FC=mpif90
+export XIOS_BINDIR=`which xios_server.exe | xargs dirname`
+export MVER=XIOS2/trunk
