@@ -1,7 +1,7 @@
 # Make file for the multiple time step demonstartion XIOS programme
 # Targets provided our detailed below...
 #
-# all: (default) Build the split file programme
+# all: (default) Build the split file reading programme
 # clean: Delete all final products and working files
 # run: run the programme
 #
@@ -32,4 +32,4 @@ run:
 
 # cleanup
 clean:
-	rm -f *.exe *.o *.mod *.MOD *.out *.err *.nc
+	rm -f *.exe *.o *.mod *.MOD *.err *.out *.nc

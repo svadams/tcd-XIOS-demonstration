@@ -1,9 +1,8 @@
-import copy
 import glob
-from netCDF4 import Dataset
 import numpy as np
 import os
 import subprocess
+from netCDF4 import Dataset
 import unittest
 
 import xios_examples.shared_testing as xshared
@@ -11,33 +10,43 @@ import xios_examples.shared_testing as xshared
 this_path = os.path.realpath(__file__)
 this_dir = os.path.dirname(this_path)
 
-
-class SplitFile(xshared._TestCase):
+class TestSplitFile(xshared._TestCase):
     test_dir = this_dir
     kgo_cdl_dir = this_dir
+    input_split_file_raw = "./prog_file_2022121405-2022121408.cdl"
+    input_split_file = "./input_split_file.nc"
     executable = "./split_file_test.exe"
     rtol = 5e-03
 
-    def test_split_file_output(self):
+    @unittest.expectedFailure
+    def test_split_file(self):
         """
         Check/test the split across files of outputted fields are correct.
         """
+
+        # Create netcdf input file to read from
+        subprocess.run(
+            [
+                "ncgen",
+                "-k",
+                "nc4",
+                "-o",
+                self.input_split_file,
+                self.input_split_file_raw,
+             ],
+            cwd=self.kgo_cdl_dir,
+            check=True,
+        )
+
+        # Run test simulation
         self.run_mpi_xios()
 
         with open("{}/xios.xml".format(self.test_dir)) as cxml:
             print(cxml.read(), flush=True)
 
         kgo_cdl_files = [
-            "diag_file_2022121313-2022121316.cdl",
-            "diag_file_2022121317-2022121320.cdl",
-            "diag_file_2022121321-2022121400.cdl",
-            "diag_file_2022121401-2022121404.cdl",
             "diag_file_2022121405-2022121408.cdl",
             "diag_file_2022121409-2022121412.cdl",
-            "prog_file_2022121313-2022121316.cdl",
-            "prog_file_2022121317-2022121320.cdl",
-            "prog_file_2022121321-2022121400.cdl",
-            "prog_file_2022121401-2022121404.cdl",
             "prog_file_2022121405-2022121408.cdl",
             "prog_file_2022121409-2022121412.cdl",
         ]

@@ -22,7 +22,12 @@
     </field_definition>
 
 
-  <file_definition type="one_file" enabled=".true.">
+  <file_definition>
+    <file id="input_split_file" name="input_split_file" output_freq="1ts" mode="read" enabled=".true.">
+      <field_group>
+        <field id="read_temperature" name="temperature" grid_ref="model" operation="instant" />
+      </field_group>
+    </file>
     <file id="prog_file" name="prog_file" output_freq="1ts" split_freq="4ts" enabled=".true.">
       <field_group operation="instant">
         <field field_ref="temperature" />
@@ -34,5 +39,5 @@
       </field_group>
     </file>
   </file_definition>
-  
+
 </context>
