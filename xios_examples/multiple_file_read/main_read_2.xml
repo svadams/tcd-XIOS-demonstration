@@ -21,7 +21,7 @@
    </grid_definition>
 
    <file_definition type="one_file" output_freq="1h" enabled=".TRUE.">
-     <file id="input_2" name="input_2" enabled=".TRUE.">
+     <file id="input_2" name="input_2" mode="read" enabled=".TRUE.">
        <field field_ref="field_B" name="field_B" />
      </file>
    </file_definition>

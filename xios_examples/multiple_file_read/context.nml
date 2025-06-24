@@ -5,5 +5,5 @@
 !   character(len=20): context_names(4): the name of each custom context
 !
 n_contexts=3
-context_names='input_2' 'input_1' 'output' ''
+context_names='input_1' 'input_2' 'output' ''
 /

@@ -37,4 +37,4 @@ run:
 	mpiexec -n 1 ./multiple_file_read.exe : -n 1 ./xios_server.exe
 
 clean:
-	rm -f *.exe *.o *.mod *.MOD *.out *.err *.nc xios_registry.bin
+	rm -f *.exe *.o *.mod *.MOD *.out *.err output.nc xios_registry.bin

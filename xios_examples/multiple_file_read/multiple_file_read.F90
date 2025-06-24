@@ -1,4 +1,4 @@
-program context_def_test
+program multiple_file_read
 
 use xios
 use mpi
@@ -74,42 +74,60 @@ do i_context=1,number_xios_contexts
 end do
 
 !
+! Do read from multiple contexts
 !
-! Start timestepping, and dealing with all contexts in turn
-!
-!
-timestep: do ts=1,15
-  ! change our data so we can see clearly which timestep gets written to file
-  field_A(:,:,:) = field_A(:,:,:) + 1.0d0
-  field_B(:,:,:) = field_B(:,:,:) + 1.0d0
-  field_C = field_A + field_B
-  contexts: do i_context=1,number_xios_contexts
+
+context_read: do i_context=1,2
     available: if (xios_contexts(i_context)%is_available) then
       call xios_set_current_context(xios_contexts(i_context)%handle)
-      call xios_update_calendar(ts)
       context1: if (i_context == 1) then
-        call xios_send_field("field_B", field_B)
+        call xios_recv_field("field_A", field_A)
       end if context1
       context2: if (i_context == 2) then
-        call xios_send_field("field_A", field_A)
+        call xios_recv_field("field_B", field_B)
       end if context2
-      context3: if (i_context == 3) then
-        call xios_send_field("field_C", field_C)
-      end if context3
-      ! Finalise all contexts at end of timestepping
-      finalize: if (ts == 15) then
-        call xios_context_finalize()
-        xios_contexts(i_context)%is_available = .false.
-      end if finalize
+      ! Finalise after reading as we don't need the context any more
+      call xios_context_finalize()
+      xios_contexts(i_context)%is_available = .false.
     end if available
-  end do contexts
+end do context_read
+
+! Initialise field_C
+
+field_C = field_A + field_B
+
+! TODO - clean up fields A and B as we don't need that data 
+
+!
+! Set write context
+!
+
+if (xios_contexts(3)%is_available) then
+  call xios_set_current_context(xios_contexts(3)%handle)
+end if
+
+!
+! Start timestepping
+!
+
+timestep: do ts=1,15
+  ! change our data so we can see effects of timestepping
+  field_C(:,:,:) = field_C(:,:,:) + 1.0d0
+  call xios_send_field("field_C", field_C)
 end do timestep
+
+!
+! Finalise write context after timestepping
+!
+
+call xios_context_finalize()
+xios_contexts(3)%is_available = .false.
 
 
 call MPI_COMM_FREE(comm, ierr)
 call xios_finalize()
 CALL MPI_FINALIZE(ierr)
 
-end program context_def_test
+end program multiple_file_read
 
 
