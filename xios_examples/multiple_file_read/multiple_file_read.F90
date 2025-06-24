@@ -96,13 +96,15 @@ timestep: do ts=1,15
       context3: if (i_context == 3) then
         call xios_send_field("field_C", field_C)
       end if context3
-      finalize: if (ts == xios_contexts(i_context)%closing_timestep) then
+      ! Finalise all contexts at end of timestepping
+      finalize: if (ts == 15) then
         call xios_context_finalize()
         xios_contexts(i_context)%is_available = .false.
       end if finalize
     end if available
   end do contexts
 end do timestep
+
 
 call MPI_COMM_FREE(comm, ierr)
 call xios_finalize()
