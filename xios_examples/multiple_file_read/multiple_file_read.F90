@@ -1,133 +1,123 @@
+!-----------------------------------------------------------------------------
+! (C) Crown copyright 2025 Met Office. All rights reserved.
+! The file LICENCE, distributed with this code, contains details of the terms
+! under which the code may be used.
+!-----------------------------------------------------------------------------
+!> Multiple file read using multiple contexts
+!>
 program multiple_file_read
+  use xios
+  use mpi
 
-use xios
-use mpi
+  implicit none
 
-use custom_type_mod, only : context_struct
-use context_def_mod, only :  number_xios_contexts, xios_contexts, load_contexts
+  integer :: comm = -1
+  integer :: rank = -1
+  integer :: npar = 0
 
-implicit none
+  call initialise()
+  call simulate()
+  call finalise()
+contains
 
-integer :: rank, comm, size, ierr
-character(len=*), parameter :: id="client"
+  subroutine initialise()
 
-integer :: i_context
+    type(xios_date) :: origin
+    type(xios_date) :: start
+    type(xios_duration) :: tstep
+    integer :: mpi_error
+    integer :: lenx
+    integer :: leny
 
-integer :: size_i = 2, i
-integer :: size_j = 2, j
-integer, parameter :: axis_len = 1
 
-double precision, allocatable :: field_A(:,:,:)
-double precision, allocatable :: field_B(:,:,:)
-double precision, allocatable :: field_C(:,:,:)
-double precision :: lval(axis_len)=1
+    ! Arbitrary datetime setup, required for XIOS but unused
+    origin = xios_date(2022, 2, 2, 12, 0, 0)
+    start = xios_date(2022, 12, 13, 12, 0, 0)
+    tstep = xios_hour
 
-integer :: ts
-type(xios_duration) :: dtime
+    ! Initialise MPI and XIOS
+    call MPI_INIT(mpi_error)
 
-call MPI_INIT(ierr)
+    call xios_initialize('client', return_comm=comm)
 
-call load_contexts
+    call MPI_Comm_rank(comm, rank, mpi_error)
+    call MPI_Comm_size(comm, npar, mpi_error)
 
-call xios_initialize(id, return_comm=comm)
+    ! use the axis_check context to obtain sizing information on all arrays
+    ! for use in defining the main context interpretation
+    call xios_context_initialize('domain_check', comm)
+    call xios_set_time_origin(origin)
+    call xios_set_start_date(start)
+    call xios_set_timestep(tstep)
 
-!
-!
-! Allocate and set our data
-!
-!
+    call xios_close_context_definition()
 
-allocate(field_A(size_i, size_j, axis_len))
-field_A(:,:,:) = 0.0
-allocate(field_B(size_i, size_j, axis_len))
-field_B(:,:,:) = 0.0
-allocate(field_C(size_i, size_j, axis_len))
-field_C(:,:,:) = 0.0
+    call xios_get_axis_attr('x', n_glo=lenx)
+    call xios_get_axis_attr('y', n_glo=leny)
+    
+    
+    print *, 'domain x, domain y', lenx, ', ', leny
 
-!
-!
-! This section iterates over each context, and ensures that they are
-! availiable by use by default, and have their handles assigned to them.
-! This loop ensures that they are set up consistently
-!
-!
+    ! initialize the main context for reading in input data
+    call xios_context_initialize('input_1', comm)
 
-do i_context=1,number_xios_contexts
+    call xios_set_time_origin(origin)
+    call xios_set_start_date(start)
+    call xios_set_timestep(tstep)
 
-  xios_contexts(i_context)%is_available = .true.
+    call xios_set_domain_attr("input_domain", ni=lenx, nj=leny, ibegin=0, jbegin=0)
+    
+    call xios_close_context_definition()
+       
+
+
+  end subroutine initialise
+
+  subroutine finalise()
+
+    integer :: mpi_error
+
+    ! Finalise all XIOS contexts and MPI
+    call xios_set_current_context('domain_check')
+    call xios_context_finalize()
+    call xios_set_current_context('input_1')
+    call xios_context_finalize()
+    call MPI_Comm_free(comm, mpi_error)
+    call xios_finalize()
+    call MPI_Finalize(mpi_error)
+
+  end subroutine finalise
   
-  call xios_context_initialize( &
-     trim(xios_contexts(i_context)%context_name), comm)
-  call xios_get_handle( &
-     trim(xios_contexts(i_context)%context_name), &
-     xios_contexts(i_context)%handle)
-  call xios_set_current_context(xios_contexts(i_context)%handle)
+  subroutine simulate()
 
-  call xios_set_axis_attr("model_axis", n_glo=axis_len, value=lval)
-  call xios_set_domain_attr("model_domain", data_dim=2, ni_glo=size_i, &
-     nj_glo=size_j, ibegin=0, jbegin=0, ni=size_i, nj=size_j, &
-     type='rectilinear')
-  dtime%second = 3600
-  call xios_set_timestep(dtime)
+    type(xios_date) :: current
+    integer :: ts
+    integer :: lenx
+    integer :: leny
 
-  call xios_close_context_definition()
-end do
+    ! Allocatable arrays, size is taken from input file
+    double precision, dimension (:,:), allocatable :: field_A
 
-!
-! Do read from multiple contexts
-!
+    call xios_get_domain_attr('input_domain', ni_glo=lenx)
+    call xios_get_domain_attr('input_domain', nj_glo=leny)
 
-context_read: do i_context=1,2
-    available: if (xios_contexts(i_context)%is_available) then
-      call xios_set_current_context(xios_contexts(i_context)%handle)
-      context1: if (i_context == 1) then
-        call xios_recv_field("field_A", field_A)
-      end if context1
-      context2: if (i_context == 2) then
-        call xios_recv_field("field_B", field_B)
-      end if context2
-      ! Finalise after reading as we don't need the context any more
-      call xios_context_finalize()
-      xios_contexts(i_context)%is_available = .false.
-    end if available
-end do context_read
+    allocate ( field_A(leny, lenx) )
 
-! Initialise field_C
+    ! Load data from the input file
+    call xios_recv_field('field_A', field_A)
 
-field_C = field_A + field_B
+    do ts=1, 1
+      call xios_update_calendar(ts)
+      call xios_get_current_date(current)
+      ! Send (copy) the original data to the output file.
+      !call xios_send_field('odata', inodata)
+      ! Send (copy) the expected data to the output file.
+      !call xios_send_field('edata', inedata)
+    enddo
 
-! TODO - clean up fields A and B as we don't need that data 
+    deallocate (field_A)
 
-!
-! Set write context
-!
+  end subroutine simulate
 
-if (xios_contexts(3)%is_available) then
-  call xios_set_current_context(xios_contexts(3)%handle)
-end if
-
-!
-! Start timestepping
-!
-
-timestep: do ts=1,15
-  ! change our data so we can see effects of timestepping
-  field_C(:,:,:) = field_C(:,:,:) + 1.0d0
-  call xios_send_field("field_C", field_C)
-end do timestep
-
-!
-! Finalise write context after timestepping
-!
-
-call xios_context_finalize()
-xios_contexts(3)%is_available = .false.
-
-
-call MPI_COMM_FREE(comm, ierr)
-call xios_finalize()
-CALL MPI_FINALIZE(ierr)
 
 end program multiple_file_read
-
-

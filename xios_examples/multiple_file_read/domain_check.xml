@@ -1,0 +1,25 @@
+<context>
+
+  <calendar type="Gregorian"/>
+
+  <axis_definition>
+    <axis id="x" unit="1" long_name="x coordinate" />
+    <axis id="y" unit="1" long_name="y coordinate" />
+
+  </axis_definition>
+
+  <grid_definition>
+    <grid id="input_grid">
+      <axis axis_ref="x" />
+      <axis axis_ref="y" />
+    </grid>
+
+  </grid_definition>
+
+  <file_definition type="one_file">
+    <file id="domain_input" name="domain_input" output_freq="1ts" mode="read" enabled=".true.">
+      <field id="field_A" name="field_A" grid_ref="input_grid" operation="instant" />
+    </file>
+  </file_definition>
+  
+</context>

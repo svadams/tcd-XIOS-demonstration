@@ -11,40 +11,42 @@ import xios_examples.shared_testing as xshared
 this_path = os.path.realpath(__file__)
 this_dir = os.path.dirname(this_path)
 
-class TestContext(xshared._TestCase):
+class TestResampleDomain(xshared._TestCase):
     test_dir = this_dir
-    transient_inputs = []
-    transient_outputs = ['output_stop10.nc','output_stop5.nc']
+    transient_inputs = ['domain_input.nc']
+    transient_outputs = ['domain_output.nc']
     rtol = 5e-03
 
-    def test_context_stop(self):
-        '''
-        Test the two output files produced by stopping the context after
-        5 and 10 timesteps
-        '''
-        # run the compiled XIOS program
-        with open('{}/xios.xml'.format(self.test_dir)) as cxml:
-            print(cxml.read(), flush=True)
-        subprocess.run(['mpiexec', '-n', '1', './context_def_test.exe', ':',
-                        '-n', '1', './xios_server.exe'],
-                        cwd=self.test_dir, check=True)
-        cdl_files = ['output_stop5.cdl', 'output_stop10.cdl']
-        output_files = [f.replace('cdl', 'nc') for f in cdl_files]
 
-        for cdl_file, outputfile in zip(cdl_files, output_files):
-            reference_file = 'reference_{}'.format(outputfile)
-            runfile = '{}/{}'.format(self.test_dir, outputfile)
-            assert(os.path.exists(runfile))
-            subprocess.run(['ncgen', '-k', 'nc4', '-o', reference_file,
-                            cdl_file], cwd=self.test_dir, check=True)
-            reference_file = '{}/{}'.format(self.test_dir, reference_file)
-            test_results = netCDF4.Dataset(runfile, 'r')['field_A'][:]
-            expected = netCDF4.Dataset(reference_file, 'r')['field_A'][:]
-            diff = test_results - expected
-            msg = ('The produced context data array in file {} '
-                   'differs from that in the reference cdl file {}\n'.
-                   format(outputfile, cdl_file))
-            if not np.allclose(test_results, expected, rtol=self.rtol):
-                print(msg)
-            self.assertTrue(np.allclose(
-                test_results, expected, rtol=self.rtol), msg=msg)
+# A list of input `.cdl` files where XIOS is known to produce different
+# output from the expected output data
+# for future investigation / ToDo
+# this is a dict, where the name of the key is the name of the test
+# to register as a known_failure (tname)
+# and the value is a string explaining the failure
+# this handles FAIL conditions but NOT ERROR conditions
+known_failures = {'test_domain_input_edge_simple_square_ten':
+                  ('The bi-linear polynomial poorly reproduces the'
+                   ' input x^2+y^2 function'),
+                  'test_domain_input_simple_square_ten':
+                  ('The bi-linear polynomial poorly reproduces the'
+                   ' input x^2+y^2 function')
+                  }
+
+# iterate through `.cdl` files in this test case folder
+for f in glob.glob('{}/*.cdl'.format(this_dir)):
+    # unique name for the test
+    tname = 'test_{}'.format(os.path.splitext(os.path.basename(f))[0])
+    # add the test as an attribute (function) to the test class
+    if os.environ.get('MVER', '').startswith('XIOS3/trunk'):
+        # these tests are hitting exceptions with XIOS3
+        # but not XIOS2, so skip for XIOS3 runner
+        setattr(TestResampleDomain, tname,
+                unittest.skip(TestResampleDomain.make_a_resample_test(f)))
+    elif tname in known_failures:
+        # set decorator @unittest.expectedFailure
+        setattr(TestResampleDomain, tname,
+                unittest.expectedFailure(TestResampleDomain.make_a_resample_test(f)))
+    else:
+        setattr(TestResampleDomain, tname,
+                TestResampleDomain.make_a_resample_test(f))

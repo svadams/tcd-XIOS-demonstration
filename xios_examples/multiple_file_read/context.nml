@@ -1,9 +1,0 @@
-&CUSTOM_CONTEXTS
-!
-! CUSTOM_CONTEXTS namelist:
-!   integer: n_contexts: the number of contexts to be read in
-!   character(len=20): context_names(4): the name of each custom context
-!
-n_contexts=3
-context_names='input_1' 'input_2' 'output' ''
-/

@@ -1,9 +1,9 @@
 <?xml version="1.0"?>
 <simulation>
 
-<context id="input_1" src="main_read_1.xml"/>
-<context id="input_2" src="main_read_2.xml"/>
-<context id="output" src="main_write.xml"/>
+<context id="domain_check" src="domain_check.xml"/>
+<context id="input_1" src="input_1.xml"/>
+
 <context id="xios" src="xios.xml"/>
 
 </simulation>

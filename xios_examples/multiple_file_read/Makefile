@@ -1,7 +1,7 @@
-# Make file for the resample demonstartion XIOS programme
+# Make file for the multiple file read demo
 # Targets provided our detailed below...
 #
-# all: (default) Build the context programme
+# all: (default) Build the programme
 # clean: Delete all final products and working files
 # run: run the programme
 #
@@ -15,26 +15,20 @@
 
 .PHONY: all, clean, run
 
-OBJ = custom_type_mod.o context_def_mod.o
-
 all: multiple_file_read
 
-custom_type_mod.o: custom_type_mod.F90
-	$(FC) $(FCFLAGS) -c $<
-
-context_def_mod.o: context_def_mod.F90 custom_type_mod.o
-	$(FC) $(FCFLAGS) -c $<
-
-multiple_file_read.o: multiple_file_read.F90 custom_type_mod.o context_def_mod.o
+# fortran compilation
+%.o: %.F90
 	$(FC) $(FCFLAGS) -c $<
 
 # fortran linking
-multiple_file_read: multiple_file_read.o $(OBJ)
-	$(FC) -o multiple_file_read.exe multiple_file_read.o $(OBJ) $(LDFLAGS) \
+multiple_file_read: multiple_file_read.o
+	$(FC) -o multiple_file_read.exe multiple_file_read.o $(LDFLAGS) \
 		&& ln -fs $(XIOS_BINDIR)/xios_server.exe .
 
 run:
 	mpiexec -n 1 ./multiple_file_read.exe : -n 1 ./xios_server.exe
 
+# cleanup
 clean:
-	rm -f *.exe *.o *.mod *.MOD *.out *.err output.nc xios_registry.bin
+	rm -f *.exe *.o *.mod *.MOD *.out *.err output.nc
