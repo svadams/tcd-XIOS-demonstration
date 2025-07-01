@@ -1,0 +1,33 @@
+netcdf domain_input_2 {
+dimensions:
+        x = 5 ;
+        y = 5 ;
+variables:
+        float x(x) ;
+                x:long_name = "x coordinate" ;
+                x:units = "1";
+        float y(y) ;
+                y:long_name = "y coordinate" ;
+                y:units = "1";
+        double field_B(y,x) ;
+                field_B:long_name = "field B input data values" ;
+                field_B:units = "1";
+
+// global attributes:
+                :title = "Field B input data" ;
+
+data:
+
+ x = 0, 2, 4, 6, 8 ;
+
+ y = 0, 2, 4, 6, 8 ;
+
+
+ field_B =  10,  20, 30, 40, 50,
+                  10,  20, 30, 40, 50,
+                 10, 20, 30, 40, 50,
+                 10, 20, 30, 40, 50,
+                 10, 20, 30, 40, 50 ;
+
+
+}

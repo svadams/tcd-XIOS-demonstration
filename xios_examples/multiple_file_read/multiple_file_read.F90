@@ -56,20 +56,33 @@ contains
     call xios_get_axis_attr('y', n_glo=leny)
     
     
-    print *, 'domain x, domain y', lenx, ', ', leny
+    print *, 'setup domain x, setup domain y', lenx, ', ', leny
+    
+    ! We don't need the domain_check context so we can finalize it
+    call xios_context_finalize()
 
-    ! initialize the main context for reading in input data
+    ! initialize first context for reading in input data
     call xios_context_initialize('input_1', comm)
 
     call xios_set_time_origin(origin)
     call xios_set_start_date(start)
     call xios_set_timestep(tstep)
 
-    call xios_set_domain_attr("input_domain", ni=lenx, nj=leny, ibegin=0, jbegin=0)
+    call xios_set_domain_attr("input_domain_1", ni=lenx, nj=leny, ibegin=0, jbegin=0)
+    
+    call xios_close_context_definition()
+    
+    ! initialize second context for reading in input data
+    call xios_context_initialize('input_2', comm)
+
+    call xios_set_time_origin(origin)
+    call xios_set_start_date(start)
+    call xios_set_timestep(tstep)
+
+    call xios_set_domain_attr("input_domain_2", ni=lenx, nj=leny, ibegin=0, jbegin=0)
     
     call xios_close_context_definition()
        
-
 
   end subroutine initialise
 
@@ -78,10 +91,12 @@ contains
     integer :: mpi_error
 
     ! Finalise all XIOS contexts and MPI
-    call xios_set_current_context('domain_check')
-    call xios_context_finalize()
-    call xios_set_current_context('input_1')
-    call xios_context_finalize()
+    !call xios_set_current_context('domain_check')
+    !call xios_context_finalize()
+    !call xios_set_current_context('input_1')
+    !call xios_context_finalize()
+    !call xios_set_current_context('input_2')
+    !call xios_context_finalize()
     call MPI_Comm_free(comm, mpi_error)
     call xios_finalize()
     call MPI_Finalize(mpi_error)
@@ -97,14 +112,42 @@ contains
 
     ! Allocatable arrays, size is taken from input file
     double precision, dimension (:,:), allocatable :: field_A
+    double precision, dimension (:,:), allocatable :: field_B
+    
+    ! Switch to context for first read
+    
+    call xios_set_current_context('input_1')
 
-    call xios_get_domain_attr('input_domain', ni_glo=lenx)
-    call xios_get_domain_attr('input_domain', nj_glo=leny)
+    call xios_get_domain_attr('input_domain_1', ni_glo=lenx)
+    call xios_get_domain_attr('input_domain_1', nj_glo=leny)
+    
+        
+    print *, 'input domain 1 x, input domain 1 y', lenx, ', ', leny
 
     allocate ( field_A(leny, lenx) )
 
     ! Load data from the input file
     call xios_recv_field('field_A', field_A)
+    
+    ! We don't need this read context now so finalize
+    call xios_context_finalize()
+    
+    ! Switch to context for second read
+    
+    call xios_set_current_context('input_2')
+
+    call xios_get_domain_attr('input_domain_2', ni_glo=lenx)
+    call xios_get_domain_attr('input_domain_2', nj_glo=leny)
+    
+    print *, 'input domain 2 x, input domain 2 y', lenx, ', ', leny
+    
+    allocate ( field_B(leny, lenx) )
+    
+    ! Load data from the input file
+    call xios_recv_field('field_B', field_B)
+    
+    ! We don't need this read context now so finalize
+    call xios_context_finalize()
 
     do ts=1, 1
       call xios_update_calendar(ts)
@@ -116,6 +159,7 @@ contains
     enddo
 
     deallocate (field_A)
+    deallocate (field_B)
 
   end subroutine simulate
 

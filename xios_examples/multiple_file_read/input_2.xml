@@ -1,0 +1,26 @@
+<context>
+
+  <calendar type="Gregorian"/>
+
+  <domain_definition>
+    <domain id="input_domain_2" type="rectilinear" />
+  </domain_definition>
+
+  <grid_definition>
+    <grid id="input_grid_2">
+      <domain domain_ref="input_domain_2" />
+    </grid>
+  </grid_definition>
+
+  <field_definition prec="8">
+    <field id="field_B" name="field_B" grid_ref="input_grid_2" long_name="input data values" unit="1"  />
+  </field_definition>
+
+
+  <file_definition type="one_file">
+    <file id="domain_input_2" name="domain_input_2" output_freq="1ts" mode="read" enabled=".true.">
+      <field id="field_B" name="field_B" grid_ref="input_grid_2" operation="instant" />
+    </file>
+  </file_definition>
+  
+</context>

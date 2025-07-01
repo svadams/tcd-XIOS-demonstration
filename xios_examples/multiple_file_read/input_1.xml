@@ -3,23 +3,23 @@
   <calendar type="Gregorian"/>
 
   <domain_definition>
-    <domain id="input_domain" type="rectilinear" />
+    <domain id="input_domain_1" type="rectilinear" />
   </domain_definition>
 
   <grid_definition>
-    <grid id="input_grid">
-      <domain domain_ref="input_domain" />
+    <grid id="input_grid_1">
+      <domain domain_ref="input_domain_1" />
     </grid>
   </grid_definition>
 
   <field_definition prec="8">
-    <field id="field_A" name="field_A" grid_ref="input_grid" long_name="input data values" unit="1"  />
+    <field id="field_A" name="field_A" grid_ref="input_grid_1" long_name="input data values" unit="1"  />
   </field_definition>
 
 
   <file_definition type="one_file">
-    <file id="domain_input" name="domain_input" output_freq="1ts" mode="read" enabled=".true.">
-      <field id="field_A" name="field_A" grid_ref="input_grid" operation="instant" />
+    <file id="domain_input_1" name="domain_input_1" output_freq="1ts" mode="read" enabled=".true.">
+      <field id="field_A" name="field_A" grid_ref="input_grid_1" operation="instant" />
     </file>
   </file_definition>
   
