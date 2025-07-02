@@ -31,4 +31,4 @@ run:
 
 # cleanup
 clean:
-	rm -f *.exe *.o *.mod *.MOD *.out *.err output.nc
+	rm -f *.exe *.o *.mod *.MOD *.out *.err domain_output.nc

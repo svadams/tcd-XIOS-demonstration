@@ -4,6 +4,7 @@
 <context id="domain_check" src="domain_check.xml"/>
 <context id="input_1" src="input_1.xml"/>
 <context id="input_2" src="input_2.xml"/>
+<context id="output" src="output.xml"/>
 
 <context id="xios" src="xios.xml"/>
 

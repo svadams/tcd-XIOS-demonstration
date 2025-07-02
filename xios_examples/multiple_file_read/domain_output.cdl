@@ -1,0 +1,87 @@
+netcdf domain_output {
+dimensions:
+	axis_nbounds = 2 ;
+	lon = 5 ;
+	lat = 5 ;
+	time_counter = UNLIMITED ; // (5 currently)
+variables:
+	double time_instant(time_counter) ;
+		time_instant:standard_name = "time" ;
+		time_instant:long_name = "Time axis" ;
+		time_instant:calendar = "gregorian" ;
+		time_instant:units = "seconds since 2022-02-02 12:00:00" ;
+		time_instant:time_origin = "2022-02-02 12:00:00" ;
+		time_instant:bounds = "time_instant_bounds" ;
+	double time_instant_bounds(time_counter, axis_nbounds) ;
+	double time_counter(time_counter) ;
+		time_counter:axis = "T" ;
+		time_counter:standard_name = "time" ;
+		time_counter:long_name = "Time axis" ;
+		time_counter:calendar = "gregorian" ;
+		time_counter:units = "seconds since 2022-02-02 12:00:00" ;
+		time_counter:time_origin = "2022-02-02 12:00:00" ;
+		time_counter:bounds = "time_counter_bounds" ;
+	double time_counter_bounds(time_counter, axis_nbounds) ;
+	double field_C(time_counter, lat, lon) ;
+		field_C:long_name = "Output data values" ;
+		field_C:units = "1" ;
+		field_C:online_operation = "instant" ;
+		field_C:interval_operation = "1 h" ;
+		field_C:interval_write = "1 h" ;
+		field_C:cell_methods = "time: point" ;
+		field_C:coordinates = "time_instant" ;
+
+// global attributes:
+		:name = "domain_output" ;
+		:description = "Created by xios" ;
+		:title = "Created by xios" ;
+		:Conventions = "CF-1.6" ;
+		:timeStamp = "2025-Jul-02 13:51:00 GMT" ;
+		:uuid = "2cd058e8-3b1e-4567-b4f8-fb29814725f0" ;
+data:
+
+ time_instant = 27133200, 27136800, 27140400, 27144000, 27147600 ;
+
+ time_instant_bounds =
+  27133200, 27133200,
+  27136800, 27136800,
+  27140400, 27140400,
+  27144000, 27144000,
+  27147600, 27147600 ;
+
+ time_counter = 27133200, 27136800, 27140400, 27144000, 27147600 ;
+
+ time_counter_bounds =
+  27133200, 27133200,
+  27136800, 27136800,
+  27140400, 27140400,
+  27144000, 27144000,
+  27147600, 27147600 ;
+
+ field_C =
+  11, 25, 47, 77, 115,
+  15, 29, 51, 81, 119,
+  27, 41, 63, 93, 131,
+  47, 61, 83, 113, 151,
+  75, 89, 111, 141, 179,
+  12, 26, 48, 78, 116,
+  16, 30, 52, 82, 120,
+  28, 42, 64, 94, 132,
+  48, 62, 84, 114, 152,
+  76, 90, 112, 142, 180,
+  13, 27, 49, 79, 117,
+  17, 31, 53, 83, 121,
+  29, 43, 65, 95, 133,
+  49, 63, 85, 115, 153,
+  77, 91, 113, 143, 181,
+  14, 28, 50, 80, 118,
+  18, 32, 54, 84, 122,
+  30, 44, 66, 96, 134,
+  50, 64, 86, 116, 154,
+  78, 92, 114, 144, 182,
+  15, 29, 51, 81, 119,
+  19, 33, 55, 85, 123,
+  31, 45, 67, 97, 135,
+  51, 65, 87, 117, 155,
+  79, 93, 115, 145, 183 ;
+}
