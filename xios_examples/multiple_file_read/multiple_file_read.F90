@@ -69,7 +69,7 @@ contains
     call xios_set_start_date(start)
     call xios_set_timestep(tstep)
 
-    call xios_set_domain_attr("input_domain_1", ni=lenx, nj=leny, ibegin=0, jbegin=0)
+    call xios_set_domain_attr("input_domain_1", ni=lenx, nj=leny, ni_glo=lenx, nj_glo=leny, ibegin=0, jbegin=0)
     
     call xios_close_context_definition()
     
@@ -80,7 +80,7 @@ contains
     call xios_set_start_date(start)
     call xios_set_timestep(tstep)
 
-    call xios_set_domain_attr("input_domain_2", ni=lenx, nj=leny, ibegin=0, jbegin=0)
+    call xios_set_domain_attr("input_domain_2", ni=lenx, nj=leny, ni_glo=lenx, nj_glo=leny, ibegin=0, jbegin=0)
     
     call xios_close_context_definition()
     
