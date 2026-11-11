@@ -1,0 +1,30 @@
+<context>
+    <!--
+    Set calender start date.
+    This can be set to any day in January (except Jan 1st) and the test should still pass.
+    -->
+    <calendar type="Gregorian" time_origin="2024-01-01 00:00:00" start_date="2024-01-09 00:00:00"/>
+    <axis_definition>
+        <axis id="vertical_axis" n_glo="10"/>
+    </axis_definition>
+
+    <grid_definition>
+        <grid id="grid_1d">
+            <axis axis_ref="vertical_axis"/>
+        </grid>
+    </grid_definition>
+
+    <field_definition>
+        <field id="a_field" operation="instant" grid_ref="grid_1d"/>
+    </field_definition>
+
+    <file_definition type="one_file" enabled=".TRUE.">
+        <file id="monthly_output" output_freq="1mo">
+            <field field_ref="a_field"/>
+            <field field_ref="a_field" name="monthly_average" operation="average"/>
+        </file>
+        <file id="daily_output" output_freq="1d">
+            <field field_ref="a_field"/>
+        </file>
+    </file_definition>
+</context>
